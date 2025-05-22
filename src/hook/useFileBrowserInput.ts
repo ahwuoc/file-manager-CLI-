@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import * as path from "path";
 import * as fs from "fs";
 import { exec } from "child_process";
+import { log } from "console";
+import { ref } from "process";
 interface UseFileBrowserInputProps {
   items: string[];
   selectIndex: number;
@@ -42,7 +44,6 @@ export const useFileBrowserInput = ({
 
   const handleNavigation = useCallback(() => {
     const selectedItem = items[selectIndex];
-
     if (typeof selectedItem === "undefined") {
       console.log("Không có mục nào được chọn.");
       return;
@@ -62,8 +63,13 @@ export const useFileBrowserInput = ({
       process.chdir(fullPath);
       loadItems();
     } else {
-      console.log(`Bạn đã chọn file: ${selectedItem}`);
-      exit();
+      exec(`xdg-open ${fullPath}`, (error) => {
+        if (error) {
+          console.log(error);
+        } else {
+          exit();
+        }
+      });
     }
   }, [items, selectIndex, loadItems, exit]);
 
